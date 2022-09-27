@@ -28,6 +28,7 @@
     "aws-sdk": "^2.1221.0",
     "expo": "^46.0.10",
     "expo-asset": "~8.6.1",
+    "expo-av": "~12.0.4",
     "expo-constants": "~13.2.4",
     "expo-font": "~10.2.0",
     "expo-image-picker": "~13.3.1",
