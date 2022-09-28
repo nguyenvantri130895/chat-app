@@ -1,5 +1,5 @@
 import styles from './styles';
-import {ActivityIndicator, Text, useWindowDimensions, View} from "react-native";
+import {ActivityIndicator, Pressable, Text, useWindowDimensions, View} from "react-native";
 import React, {useEffect, useState} from 'react';
 import {Message as MessageModel, MessageStatus, User} from '../../src/models'
 import {Auth, DataStore, Storage} from "aws-amplify";
@@ -7,17 +7,32 @@ import {S3Image} from 'aws-amplify-react-native'
 import AudioPlayer from "../AudioPlayer";
 import {Ionicons} from "@expo/vector-icons";
 import {OpType} from "@aws-amplify/datastore";
+import MessageReply from "../MessageReply";
 
 interface MessageProps {
     message: MessageModel;
+    setAsMessageReply?: () => void;
 }
 
 const Message = (props: MessageProps) => {
     const {width} = useWindowDimensions();
-    const [message, setMessage] = useState<MessageModel>(props.message);
+    const {setAsMessageReply, message: propMessage} = props;
+
+    const [message, setMessage] = useState<MessageModel>(propMessage);
+    const [repliedTo, setRepliedTo] = useState<MessageModel | undefined>();
     const [user, setUser] = useState<User | undefined>();
     const [isMe, setIsMe] = useState<boolean | null>(null);
     const [soundUri, setSoundUri] = useState<string | null>(null);
+
+    useEffect(() => {
+        setMessage(propMessage);
+    }, [propMessage]);
+
+    useEffect(() => {
+        if (message.replyToMessageID) {
+            DataStore.query(MessageModel, message.replyToMessageID).then(setRepliedTo);
+        }
+    }, [message])
 
     useEffect(() => {
         DataStore.query(User, message.userID).then(setUser);
@@ -64,9 +79,11 @@ const Message = (props: MessageProps) => {
     }
 
     return (
-        <View
+        <Pressable
+            onLongPress={setAsMessageReply}
             style={[styles.container, isMe ? styles.leftContainer : styles.rightContainer]}>
-            <View style={{flexDirection: 'column'}}>
+            <View style={styles.message}>
+                {repliedTo && (<MessageReply message={repliedTo}/>)}
                 {message.image && (
                     <View style={{marginBottom: message.content ? 10 : 0}}>
                         <S3Image
@@ -90,7 +107,7 @@ const Message = (props: MessageProps) => {
                           color="gray"
                           style={{marginHorizontal: 5}}/>
             )}
-        </View>
+        </Pressable>
     )
 }
 
