@@ -5,6 +5,7 @@ import React, {useEffect, useState} from "react";
 import {useRoute} from "@react-navigation/native";
 import {DataStore, SortDirection} from "aws-amplify";
 import {ChatRoom, Message as MessageModel} from "../src/models";
+import {OpType} from "@aws-amplify/datastore";
 
 export default function ChatRoomScreen() {
     const route = useRoute();
@@ -15,7 +16,7 @@ export default function ChatRoomScreen() {
     useEffect(() => {
         fetchChatRoom();
         const subscription = DataStore.observe(MessageModel).subscribe(msg => {
-            if (msg.model === MessageModel && msg.opType === 'INSERT') {
+            if (msg.model === MessageModel && msg.opType === OpType.INSERT) {
                 setMessages(oldMessages => [msg.element, ...oldMessages])
             }
         })

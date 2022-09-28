@@ -1,9 +1,9 @@
 import styles from './styles';
-import {Image, Platform, Pressable, TextInput, View, Text} from "react-native";
+import {Image, Platform, Pressable, Text, TextInput, View} from "react-native";
 import React, {useEffect, useState} from 'react';
 import {AntDesign, Feather, Ionicons, MaterialCommunityIcons, SimpleLineIcons} from "@expo/vector-icons";
 import {Auth, DataStore, Storage} from "aws-amplify";
-import {Message, ChatRoom} from '../../src/models'
+import {ChatRoom, Message, MessageStatus} from '../../src/models'
 import EmojiSelector from 'react-native-emoji-selector'
 import * as ImagePicker from 'expo-image-picker';
 import {v4 as uuidv4} from 'uuid';
@@ -117,7 +117,8 @@ const MessageInput = ({chatRoom}) => {
             image: imgName,
             audio: audioName,
             userID: user.attributes.sub,
-            chatroomID: chatRoom.id
+            chatroomID: chatRoom.id,
+            status: MessageStatus.SENT
         }))
         await updateLastMessage(newMessage);
     }

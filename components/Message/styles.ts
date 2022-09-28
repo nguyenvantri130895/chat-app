@@ -5,7 +5,9 @@ const styles = StyleSheet.create({
         padding: 10,
         margin: 10,
         borderRadius: 5,
-        maxWidth: '75%'
+        maxWidth: '75%',
+        flexDirection: 'row',
+        alignItems: 'flex-end'
     },
     leftContainer: {
         backgroundColor: 'lightgrey',
