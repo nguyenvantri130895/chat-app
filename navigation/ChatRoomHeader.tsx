@@ -1,10 +1,11 @@
 import {Feather} from '@expo/vector-icons';
 import * as React from 'react';
-import {Image, Text, useWindowDimensions, View} from 'react-native';
+import {Image, Pressable, Text, useWindowDimensions, View} from 'react-native';
 import {useEffect, useState} from "react";
 import {Auth, DataStore} from "aws-amplify";
 import {ChatRoomUser, User, ChatRoom} from "../src/models";
 import moment from "moment";
+import {useNavigation} from "@react-navigation/native";
 
 type ChatRoomHeaderProps = {
     id: string;
@@ -16,6 +17,8 @@ const ChatRoomHeader = (props: ChatRoomHeaderProps) => {
     const [user, setUser] = useState<User | null>(null);
     const [allUsers, setAllUsers] = useState<User[]>([]);
     const [chatRoom, setChatRoom] = useState<ChatRoom | undefined>();
+
+    const navigation = useNavigation();
 
     const fetchUsers = async () => {
         const fetchedUsers = (await DataStore.query(ChatRoomUser))
@@ -58,6 +61,10 @@ const ChatRoomHeader = (props: ChatRoomHeaderProps) => {
         return `Last seen online ${moment(user.lastOnlineAt).fromNow()}`
     }
 
+    const openInfo = () => {
+        navigation.navigate('GroupInfoScreen', {id})
+    }
+
     return (
         <View style={{
             flexDirection: 'row',
@@ -70,10 +77,10 @@ const ChatRoomHeader = (props: ChatRoomHeaderProps) => {
         }}>
             <Image source={{uri: chatRoom?.imageUri || user?.imageUri || ''}}
                    style={{width: 30, height: 30, borderRadius: 30}}/>
-            <View style={{flex: 1, marginLeft: 10}}>
+            <Pressable onPress={openInfo} style={{flex: 1, marginLeft: 10}}>
                 <Text style={{fontWeight: 'bold'}}>{chatRoom?.name || user?.name}</Text>
                 <Text numberOfLines={1}>{isGroup() ? getUsernames() : getLastOnlineText()}</Text>
-            </View>
+            </Pressable>
             <Feather name="camera" size={24} color={'black'} style={{marginRight: 10}}/>
             <Feather name="edit-2" size={24} color={'black'}/>
         </View>

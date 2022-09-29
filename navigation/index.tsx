@@ -16,6 +16,7 @@ import {RootStackParamList} from '../types';
 import LinkingConfiguration from './LinkingConfiguration';
 import UserScreen from '../screens/UserScreen';
 import ChatRoomHeader from './ChatRoomHeader';
+import GroupInfoScreen from '../screens/GroupInfoScreen';
 
 export default function Navigation({colorScheme}: { colorScheme: ColorSchemeName }) {
     return (
@@ -44,8 +45,8 @@ function RootNavigator() {
                           options={(route) => ({
                               headerTitle: () => <ChatRoomHeader id={route.route.params?.id}/>,
                               headerBackTitleVisible: false,
-                              title: 'Username'
                           })}/>
+            <Stack.Screen name="GroupInfoScreen" component={GroupInfoScreen}/>
             <Stack.Screen name="NotFound" component={NotFoundScreen} options={{title: 'Oops!'}}/>
         </Stack.Navigator>
     );
