@@ -8,6 +8,7 @@ import AudioPlayer from "../AudioPlayer";
 import {Ionicons} from "@expo/vector-icons";
 import {OpType} from "@aws-amplify/datastore";
 import MessageReply from "../MessageReply";
+import {useActionSheet} from "@expo/react-native-action-sheet";
 
 type MessageProps = {
     message: MessageModel;
@@ -23,6 +24,8 @@ const Message = (props: MessageProps) => {
     const [user, setUser] = useState<User | undefined>();
     const [isMe, setIsMe] = useState<boolean | null>(null);
     const [soundUri, setSoundUri] = useState<string | null>(null);
+    const [isDeleted, setIsDeleted] = useState(false);
+    const {showActionSheetWithOptions} = useActionSheet();
 
     useEffect(() => {
         setMessage(propMessage);
@@ -38,8 +41,15 @@ const Message = (props: MessageProps) => {
         DataStore.query(User, message.userID).then(setUser);
 
         const subscription = DataStore.observe(MessageModel, message.id).subscribe(msg => {
-            if (msg.model === MessageModel && msg.opType === OpType.UPDATE) {
-                setMessage(message => ({...message, ...msg.element}))
+            if (msg.model === MessageModel) {
+                if (msg.opType === OpType.UPDATE) {
+                    setMessage(message => ({...message, ...msg.element}));
+                    return;
+                }
+                if (msg.opType === OpType.DELETE) {
+                    setIsDeleted(true);
+                    return;
+                }
             }
         })
         return () => subscription.unsubscribe();
@@ -74,13 +84,39 @@ const Message = (props: MessageProps) => {
         }
     }
 
+    const deleteMessage = async () => {
+        await DataStore.delete(message);
+    }
+
+    const onActionPress = (index: number) => {
+        if (index === 0) {
+            setAsMessageReply && setAsMessageReply();
+            return;
+        }
+        if (index === 1) {
+            if (isMe) {
+                deleteMessage();
+                return;
+            }
+            alert(`Cannot delete other person's message`);
+            return;
+        }
+    }
+
+    const openActionMenu = () => {
+        const options = ['Reply', 'Delete', 'Cancel'];
+        const destructiveButtonIndex = 1;
+        const cancelButtonIndex = 2;
+        showActionSheetWithOptions({options, destructiveButtonIndex, cancelButtonIndex}, onActionPress);
+    }
+
     if (!user) {
         return <ActivityIndicator/>
     }
 
     return (
         <Pressable
-            onLongPress={setAsMessageReply}
+            onLongPress={openActionMenu}
             style={[styles.container, isMe ? styles.leftContainer : styles.rightContainer]}>
             <View style={styles.message}>
                 {repliedTo && (<MessageReply message={repliedTo}/>)}
@@ -99,7 +135,8 @@ const Message = (props: MessageProps) => {
                     </View>
                 )}
                 {!!message.content && (
-                    <Text style={[styles.message, {color: isMe ? 'black' : 'white'}]}>{message.content}</Text>
+                    <Text
+                        style={[styles.message, {color: isMe ? 'black' : 'white'}]}>{isDeleted ? 'Message deleted' : message.content}</Text>
                 )}
             </View>
             {isMe && !!message.status && message.status !== MessageStatus.SENT && (

@@ -10,6 +10,7 @@ import {withAuthenticator} from 'aws-amplify-react-native';
 import {useEffect, useState} from "react";
 import {Message, MessageStatus, User} from "./src/models";
 import {OpType} from "@aws-amplify/datastore";
+import {ActionSheetProvider} from "@expo/react-native-action-sheet";
 
 // Disable analytics
 Amplify.configure({
@@ -91,7 +92,9 @@ function App() {
 
     return (
         <SafeAreaProvider>
-            <Navigation colorScheme={colorScheme}/>
+            <ActionSheetProvider>
+                <Navigation colorScheme={colorScheme}/>
+            </ActionSheetProvider>
             <StatusBar/>
         </SafeAreaProvider>
     );

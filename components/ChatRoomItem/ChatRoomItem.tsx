@@ -14,6 +14,7 @@ export default function ChatRoomItem(props: ChatRoomItemProps) {
     const {chatRoom} = props;
     const [user, setUser] = useState<User | null>(null); // the display user
     const [lastMessage, setLastMessage] = useState<Message | undefined>();
+    const [isLoading, setIsLoading] = useState(true);
 
     const navigation = useNavigation();
     useEffect(() => {
@@ -23,6 +24,7 @@ export default function ChatRoomItem(props: ChatRoomItemProps) {
                 .map(chatRoomUser => chatRoomUser.user);
             const authUser = await Auth.currentAuthenticatedUser();
             setUser(chatRoomUsers.find(user => user?.id !== authUser.attributes.sub) || null);
+            setIsLoading(false);
         }
         fetchUsers();
         if (!chatRoom.chatRoomLastMessageId) {
@@ -35,7 +37,7 @@ export default function ChatRoomItem(props: ChatRoomItemProps) {
         navigation.navigate('ChatRoom', {id: chatRoom?.id});
     }
 
-    if (!user) {
+    if (isLoading) {
         return <ActivityIndicator/>
     }
 
