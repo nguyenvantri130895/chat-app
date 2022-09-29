@@ -10,7 +10,7 @@ import {v4 as uuidv4} from 'uuid';
 import {Audio, AVPlaybackStatus} from 'expo-av';
 import MessageComponent from '../Message'
 
-interface MessageInputProps {
+type MessageInputProps = {
     chatRoom: ChatRoom;
     messageReplyTo: MessageModel | null;
     removeMessageReplyTo: () => void;

@@ -9,7 +9,7 @@ import {Ionicons} from "@expo/vector-icons";
 import {OpType} from "@aws-amplify/datastore";
 import MessageReply from "../MessageReply";
 
-interface MessageProps {
+type MessageProps = {
     message: MessageModel;
     setAsMessageReply?: () => void;
 }

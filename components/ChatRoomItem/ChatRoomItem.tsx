@@ -6,7 +6,12 @@ import {User, ChatRoom, ChatRoomUser, Message} from "../../src/models";
 import {Auth, DataStore} from "aws-amplify";
 import moment from "moment";
 
-export default function ChatRoomItem({chatRoom}) {
+type ChatRoomItemProps = {
+    chatRoom: ChatRoom;
+}
+
+export default function ChatRoomItem(props: ChatRoomItemProps) {
+    const {chatRoom} = props;
     const [user, setUser] = useState<User | null>(null); // the display user
     const [lastMessage, setLastMessage] = useState<Message | undefined>();
 
@@ -27,7 +32,7 @@ export default function ChatRoomItem({chatRoom}) {
     }, [])
 
     const onPress = () => {
-        navigation.navigate('ChatRoom', {id: chatRoom.id});
+        navigation.navigate('ChatRoom', {id: chatRoom?.id});
     }
 
     if (!user) {
@@ -39,7 +44,7 @@ export default function ChatRoomItem({chatRoom}) {
     return (
         <Pressable onPress={onPress} style={styles.container}>
             <Image
-                source={{uri: user?.imageUri || ""}}
+                source={{uri: chatRoom?.imageUri || user?.imageUri || ""}}
                 style={styles.image}
             />
 
@@ -51,7 +56,7 @@ export default function ChatRoomItem({chatRoom}) {
 
             <View style={styles.rightContainer}>
                 <View style={styles.row}>
-                    <Text style={styles.name}>{user.name}</Text>
+                    <Text style={styles.name} numberOfLines={1}>{chatRoom?.name || user?.name}</Text>
                     <Text style={styles.text}>{time}</Text>
                 </View>
                 <Text numberOfLines={1} style={styles.text}>

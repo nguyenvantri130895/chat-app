@@ -1,31 +1,22 @@
 import React from "react";
 import {Text, Image, View, Pressable} from "react-native";
 import styles from "./styles";
-import {useNavigation} from "@react-navigation/native";
-import {Auth, DataStore} from "aws-amplify";
-import {ChatRoomUser, ChatRoom, User} from "../../src/models";
+import {User} from "../../src/models";
+import {Feather} from "@expo/vector-icons";
 
-export default function UserItem({user}) {
-    const navigation = useNavigation();
+type UserItemProps = {
+    user: User;
+    onPress: () => void;
+    isSelected?: boolean;
+}
 
-    const onPress = async () => {
-        // Create a chat room
-        const newChatRoom = await DataStore.save(new ChatRoom({newMessages: 0}))
-
-        // Connect authenticated user with the chat room
-        const authUser = await Auth.currentAuthenticatedUser();
-        const dbUser = await DataStore.query(User, authUser.attributes.sub)
-        await DataStore.save(new ChatRoomUser({user: dbUser, chatRoom: newChatRoom}))
-
-        // Connect clicked user with the chat room
-        await DataStore.save(new ChatRoomUser({user, chatRoom: newChatRoom}));
-        navigation.navigate('ChatRoom', {id: newChatRoom.id})
-    }
+export default function UserItem(props: UserItemProps) {
+    const {user, onPress, isSelected} = props;
 
     return (
         <Pressable onPress={onPress} style={styles.container}>
             <Image
-                source={{uri: user.imageUri}}
+                source={{uri: user?.imageUri || ''}}
                 style={styles.image}
             />
 
@@ -34,6 +25,9 @@ export default function UserItem({user}) {
                     <Text style={styles.name}>{user.name}</Text>
                 </View>
             </View>
+            {isSelected !== undefined && (
+                <Feather name={isSelected ? 'check-circle' : 'circle'} size={20} color="#4f4f4f"/>
+            )}
         </Pressable>
 
     );

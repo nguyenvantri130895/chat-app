@@ -6,7 +6,7 @@ import {Auth, DataStore, Storage} from "aws-amplify";
 import {S3Image} from 'aws-amplify-react-native'
 import AudioPlayer from "../AudioPlayer";
 
-interface MessageReplyProps {
+type MessageReplyProps = {
     message: MessageModel;
 }
 

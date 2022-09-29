@@ -35,11 +35,13 @@ const styles = StyleSheet.create({
     row: {
         flexDirection: 'row',
         justifyContent: 'space-between',
+        alignItems: 'center'
     },
     name: {
         fontWeight: 'bold',
         fontSize: 18,
         marginBottom: 3,
+        maxWidth: '75%'
     },
     text: {
         color: 'grey',

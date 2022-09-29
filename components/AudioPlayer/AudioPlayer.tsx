@@ -4,7 +4,12 @@ import React, {useEffect, useState} from 'react';
 import {Feather} from "@expo/vector-icons";
 import {Audio, AVPlaybackStatus} from 'expo-av';
 
-const AudioPlayer = ({soundUri}) => {
+type AudioPlayerProps = {
+    soundUri: string;
+}
+
+const AudioPlayer = (props: AudioPlayerProps) => {
+    const {soundUri} = props;
     const [sound, setSound] = useState<Audio.Sound | null>(null);
     const [pause, setPause] = useState(true);
     const [audioProgress, setAudioProgress] = useState(0);
@@ -12,7 +17,7 @@ const AudioPlayer = ({soundUri}) => {
 
     useEffect(() => {
         loadSound();
-        () => {
+        return () => {
             if (sound) {
                 sound.unloadAsync();
             }
