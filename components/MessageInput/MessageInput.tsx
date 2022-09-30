@@ -1,15 +1,23 @@
 import styles from './styles';
-import {Image, Platform, Pressable, TextInput, View, Text} from "react-native";
+import {Image, Platform, Pressable, Text, TextInput, View} from "react-native";
 import React, {useEffect, useState} from 'react';
 import {AntDesign, Feather, Ionicons, MaterialCommunityIcons, SimpleLineIcons} from "@expo/vector-icons";
 import {Auth, DataStore, Storage} from "aws-amplify";
-import {Message, ChatRoom} from '../../src/models'
+import {ChatRoom, Message as MessageModel, Message, MessageStatus} from '../../src/models'
 import EmojiSelector from 'react-native-emoji-selector'
 import * as ImagePicker from 'expo-image-picker';
 import {v4 as uuidv4} from 'uuid';
 import {Audio, AVPlaybackStatus} from 'expo-av';
+import MessageComponent from '../Message'
 
-const MessageInput = ({chatRoom}) => {
+type MessageInputProps = {
+    chatRoom: ChatRoom;
+    messageReplyTo: MessageModel | null;
+    removeMessageReplyTo: () => void;
+}
+
+const MessageInput = (props: MessageInputProps) => {
+    const {chatRoom, messageReplyTo, removeMessageReplyTo} = props;
     const [message, setMessage] = useState('');
     const [isEmojiPickerOpen, setIsEmojiPickerOpen] = useState(false);
     const [image, setImage] = useState<string | null>(null);
@@ -60,7 +68,7 @@ const MessageInput = ({chatRoom}) => {
         }
     };
 
-    const progressCallback = (progress) => {
+    const progressCallback = (progress: ProgressEvent) => {
         setProgress(progress.loaded / progress.total);
     }
 
@@ -117,7 +125,9 @@ const MessageInput = ({chatRoom}) => {
             image: imgName,
             audio: audioName,
             userID: user.attributes.sub,
-            chatroomID: chatRoom.id
+            chatroomID: chatRoom.id,
+            status: MessageStatus.SENT,
+            replyToMessageID: messageReplyTo?.id
         }))
         await updateLastMessage(newMessage);
     }
@@ -129,6 +139,7 @@ const MessageInput = ({chatRoom}) => {
         setProgress(0);
         setSoundUri(null);
         setSound(null);
+        removeMessageReplyTo();
     }
 
     // Audio
@@ -217,6 +228,18 @@ const MessageInput = ({chatRoom}) => {
         <View
             style={[styles.sendMessageArea, {height: isEmojiPickerOpen ? '50%' : 'auto'}]}
         >
+            {messageReplyTo && (
+                <View style={{backgroundColor: '#f2f2f2', padding: 5, flexDirection: 'row'}}>
+                    <View style={{flex: 1}}>
+                        <Text>Reply to:</Text>
+                        <MessageComponent message={messageReplyTo}/>
+                    </View>
+                    <Pressable onPress={() => removeMessageReplyTo()}>
+                        <AntDesign name="close" size={24} color="black" style={{margin: 5}}/>
+                    </Pressable>
+                </View>
+
+            )}
             {image && (
                 <View style={styles.sendImageContainer}>
                     <Image source={{uri: image}} style={{height: 100, width: 100, borderRadius: 10}}/>

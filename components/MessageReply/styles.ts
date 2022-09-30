@@ -1,27 +1,19 @@
-import {StyleSheet} from 'react-native';
+import { StyleSheet } from 'react-native';
 
 const styles = StyleSheet.create({
     container: {
         padding: 10,
-        margin: 10,
+        marginVertical: 10,
         borderRadius: 5,
-        maxWidth: '75%',
         flexDirection: 'row',
-        alignItems: 'flex-end'
+        alignItems: 'flex-start',
+        marginRight: 'auto'
     },
     leftContainer: {
         backgroundColor: 'lightgrey',
-        marginLeft: 'auto',
-        marginRight: 10
     },
     rightContainer: {
         backgroundColor: '#3777f0',
-        marginLeft: 10,
-        marginRight: 'auto'
-    },
-    message: {
-        flex: 1,
-        flexDirection: 'column'
     }
 });
 

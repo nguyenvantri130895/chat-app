@@ -5,17 +5,19 @@ import React, {useEffect, useState} from "react";
 import {useRoute} from "@react-navigation/native";
 import {DataStore, SortDirection} from "aws-amplify";
 import {ChatRoom, Message as MessageModel} from "../src/models";
+import {OpType} from "@aws-amplify/datastore";
 
 export default function ChatRoomScreen() {
     const route = useRoute();
 
     const [chatRoom, setChatRoom] = useState<ChatRoom | null>(null)
     const [messages, setMessages] = useState<MessageModel[]>([])
+    const [messageReplyTo, setMessageReplyTo] = useState<MessageModel | null>(null)
 
     useEffect(() => {
         fetchChatRoom();
         const subscription = DataStore.observe(MessageModel).subscribe(msg => {
-            if (msg.model === MessageModel && msg.opType === 'INSERT') {
+            if (msg.model === MessageModel && msg.opType === OpType.INSERT) {
                 setMessages(oldMessages => [msg.element, ...oldMessages])
             }
         })
@@ -58,10 +60,11 @@ export default function ChatRoomScreen() {
         <View style={styles.page}>
             <FlatList
                 data={messages}
-                renderItem={({item}) => <Message message={item}/>}
+                renderItem={({item}) => <Message message={item} setAsMessageReply={() => setMessageReplyTo(item)}/>}
                 inverted
             />
-            <MessageInput chatRoom={chatRoom}/>
+            <MessageInput chatRoom={chatRoom} messageReplyTo={messageReplyTo}
+                          removeMessageReplyTo={() => setMessageReplyTo(null)}/>
         </View>
     )
 }
