@@ -85,10 +85,13 @@ const Message = (props: MessageProps) => {
     }
 
     const deleteMessage = async () => {
-        await DataStore.delete(message);
+        const messageFromDataStore = await DataStore.query(MessageModel, message.id);
+        if (messageFromDataStore) {
+            await DataStore.delete(messageFromDataStore);
+        }
     }
 
-    const onActionPress = (index: number) => {
+    const onActionPress = (index?: number) => {
         if (index === 0) {
             setAsMessageReply && setAsMessageReply();
             return;
